@@ -1,0 +1,65 @@
+create webAPI
+open package manage nuget
+tool install --global dotnet-ef
+
+then right click to project and click manage nuget packages
+and intsall microsoft entityframework core - microsoft entityframework design - microsoft entityframework sqlite
+
+then add connection string to appsetting.json
+
+    "ConnectionStrings": {
+        "DefaultConnection": "C:\\sqlite.db"
+    },
+
+
+    after some coding in https://www.youtube.com/watch?v=PDiRDNNc2tw
+    open manage nuget package console and go to right directory:
+    dotnet ef migrations add Initial
+    and then 
+    dotnet ef database update
+
+
+    download sqlitebrowser.org
+    I downloaded portable one
+
+
+
+    Required one-to-many without cascade delete
+    By convention, required relationships are configured to cascade delete; this means that when the principal is deleted, all of its dependents are deleted as well, since dependents cannot exist in the database without a principal. It's possible to configure EF to throw an exception instead of automatically deleting dependent rows that can no longer exist:
+
+
+
+
+_________________________________________________________________
+
+
+
+In the described scenario, each assessment has a relationship with a module. An assessment is a component or part of a module, representing a specific evaluation or testing item within that module. Each module can have one or more assessments, and each assessment is associated with a particular module.
+
+In the class structure or database schema, you might represent this relationship by having a collection of assessments within the Module class. Here's a simplified example:
+
+csharp
+Copy code
+public class Module
+{
+    public string ModuleCode { get; set; }
+    public string Title { get; set; }
+
+    // Collection navigation property
+    public List<Assessment> Assessments { get; set; }
+}
+
+public class Assessment
+{
+    public int AssessmentId { get; set; }
+    public int MaxMark { get; set; }
+    public int ObtainedMark { get; set; }
+
+    // Foreign key
+    public string ModuleCode { get; set; }
+    public Module Module { get; set; }
+}
+In this example:
+
+The Module class has a collection navigation property Assessments, indicating that it can have multiple assessments associated with it.
+The Assessment class has a foreign key ModuleCode that establishes a relationship with the Module class. The Module property represents the navigation property to the associated module.
