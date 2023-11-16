@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "G:\\WebApplication\\AdministratorSystem.csproj": {}
+    "F:\\Projects\\AdminstratorSystem\\AdministratorSystem.csproj": {}
   },
   "projects": {
-    "G:\\WebApplication\\AdministratorSystem.csproj": {
+    "F:\\Projects\\AdminstratorSystem\\AdministratorSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\WebApplication\\AdministratorSystem.csproj",
+        "projectUniqueName": "F:\\Projects\\AdminstratorSystem\\AdministratorSystem.csproj",
         "projectName": "AdministratorSystem",
-        "projectPath": "G:\\WebApplication\\AdministratorSystem.csproj",
+        "projectPath": "F:\\Projects\\AdminstratorSystem\\AdministratorSystem.csproj",
         "packagesPath": "C:\\Users\\amir3\\.nuget\\packages\\",
-        "outputPath": "G:\\WebApplication\\obj\\",
+        "outputPath": "F:\\Projects\\AdminstratorSystem\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\amir3\\AppData\\Roaming\\NuGet\\NuGet.Config",

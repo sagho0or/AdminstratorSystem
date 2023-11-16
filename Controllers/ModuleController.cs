@@ -29,12 +29,13 @@ namespace AdministratorSystem.Controllers
             return Ok(await _context.Module.ToListAsync());
         }
 
-        public async Task AsssignAssement(int moduleId, int assementId)
+        [HttpPost("{moduleId}/{assesmentId}")]
+        public async Task AsssignAssement(int moduleId, int assessmentId)
         {
             var module = await _context.Module.FindAsync(moduleId);
             if (module.Assessments.Count < 2)
             {
-                module.Assessments.Add(_context.Assessment.Find(assementId));
+                module.Assessments.Add(_context.Assessment.Find(assessmentId));
             }
         }
 
