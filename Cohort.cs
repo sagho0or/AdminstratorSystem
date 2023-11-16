@@ -8,12 +8,9 @@
     //Distinction if the programme mark is greater than or equal to 70 and Fail if less than 50.
     public class Cohort
     {
-        public Cohort(int academicYear)
-        {
-            AcademicYear = academicYear;
-        }
         public int CohortId { get; set; }
-        public int AcademicYear { get; set; }
+        public int CohortIdentifier { get; set; }
+        public string AcademicYear { get; set; }
         public ICollection<Student>? Students { get; set; }
         // Foreign key
         public int CourseId { get; set; }

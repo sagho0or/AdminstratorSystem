@@ -7,14 +7,9 @@
     
     public class Course
     {
-        public Course(string name, int durationInYears, ICollection<Module> modules)
-        {
-            Name = name;
-            DurationInYears = durationInYears;
-            Modules = modules;
-        }
+        public int CourseId { get; set; }
         //begin with the year of the cohort - unique 6 digit
-        public string CourseId { get; set; } = string.Empty;
+        public string CourseIdentifier { get; set; } = string.Empty;
         public string Name { get; set; }
         public int DurationInYears { get; set; }
 
@@ -23,7 +18,6 @@
 
         // Collection navigation property
         public ICollection<Cohort>? Cohorts { get; set; }
-        public ICollection<Student>? Students { get; set; }
 
         public int? Mark => CalculateCourseMark();
         public string Result => GetCourseResult();

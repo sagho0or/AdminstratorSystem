@@ -16,12 +16,28 @@ namespace AdministratorSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Student>>> AddStudent(Student student)
+        public async Task<ActionResult<List<Student>>> AddStudent(int cohortId, string fullname)
         {
-            _context.Students.Add(student);
-            await _context.SaveChangesAsync();
+                // Check if the cohort exists
+                var cohort = _context.Cohort.Find(cohortId);
+                if (cohort == null)
+                {
+                    return NotFound("Cohort not found");
+                }
 
-            return Ok(await _context.Students.ToListAsync());
+                // Create a new student
+                var newStudent = new Student
+                {
+                    CohortId = cohortId,
+                    FullName = fullname
+                };
+
+
+                _context.Students.Add(newStudent);
+                await _context.SaveChangesAsync();
+
+                return Ok(await _context.Students.ToListAsync());
+            
         }
 
         [HttpGet]
@@ -35,13 +51,12 @@ namespace AdministratorSystem.Controllers
         {
             var student = await _context.Students.FindAsync(id);
 
-            foreach (var module in student.Course.Modules)
+            foreach (var module in student.Cohort.Course.Modules)
             {
                 var moduleTitle = module.Title;
                 var assesments = module.Assessments.Select(x => x.AssessmentId);
                 var score = _context.StudentAssesments.Where(item => assesments.Contains(item.Assessment.AssessmentId)).Sum(item => item.Score);
             }
-
 
             if (student == null)
             {
