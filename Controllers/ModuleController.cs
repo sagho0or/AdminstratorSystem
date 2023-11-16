@@ -19,6 +19,11 @@ namespace AdministratorSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<List<Module>>> AddModule(ModuleDto moduleDto)
         {
+            if (!ModelState.IsValid)
+            {
+                // If the ModelState is not valid based on data annotations, return a BadRequest
+                return BadRequest(ModelState);
+            }
             var module = new Module();
             module.ModuleCode = moduleDto.Code;
             module.Title = moduleDto.Title;
@@ -30,14 +35,13 @@ namespace AdministratorSystem.Controllers
         }
 
         [HttpPost("{moduleId}/{assesmentId}")]
-        public async Task AsssignAssement(int moduleId, int assessmentId)
+        public async Task AsssignAssesment(int moduleId, int assessmentId)
         {
             var module = await _context.Module.FindAsync(moduleId);
-            if (module.Assessments.Count < 2)
-            {
-                module.Assessments.Add(_context.Assessment.Find(assessmentId));
-            }
+
+            module.Assessments.Add(_context.Assessment.Find(assessmentId));
         }
+
 
         [HttpGet]
         public async Task<ActionResult<List<Module>>> GetModules()

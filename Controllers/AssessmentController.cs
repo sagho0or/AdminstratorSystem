@@ -16,8 +16,21 @@ namespace AdministratorSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Course>>> AddAssessment(Assessment assessment)
+        public async Task<ActionResult<List<Course>>> AddAssessment(AssessmentDto assessmentDto)
         {
+
+            if (!ModelState.IsValid)
+            {
+                // If the ModelState is not valid based on data annotations, return a BadRequest
+                return BadRequest(ModelState);
+            }
+
+            var assessment = new Assessment();
+            assessment.Title = assessmentDto.Title;
+            assessment.Description = assessmentDto.Description;
+            assessment.Title = assessmentDto.Title;
+            assessment.MaximumMark = assessmentDto.MaximumMark;
+
             _context.Assessment.Add(assessment);
             await _context.SaveChangesAsync();
 

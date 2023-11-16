@@ -17,6 +17,10 @@ namespace AdministratorSystem.Data
         public DbSet<Assessment> Assessment => Set<Assessment>();
         public DbSet<Cohort> Cohort => Set<Cohort>();
         public DbSet<StudentAssesment> StudentAssesments => Set<StudentAssesment>();
+        public DbSet<StudentModule> StudentModule => Set<StudentModule>();
+        public DbSet<StudentCourse> StudentCourse => Set<StudentCourse>();
+        public DbSet<CourseModule> CourseModule => Set<CourseModule>();
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,22 +34,42 @@ namespace AdministratorSystem.Data
                 .HasMany(s => s.Students)
                 .WithOne(p => p.Cohort)
                 .HasForeignKey(s => s.CohortId);
+            
+            modelBuilder.Entity<Module>()
+                .HasKey(m => m.ModuleId);
+
+            modelBuilder.Entity<Module>()
+                .Property(m => m.ModuleCode)
+                .HasMaxLength(5); // Assuming the module code is a string of length 5
 
             modelBuilder.Entity<Course>()
                 .HasKey(p => p.CourseId);
 
             modelBuilder.Entity<Course>()
-                .HasMany(p => p.Modules)
-                .WithOne(m => m.Course)
-                .HasForeignKey(m => m.CourseId);
+                .Property(p => p.CourseIdentifier)
+                .HasMaxLength(6); // Assuming the Course identifier is a string of length 6
 
-            modelBuilder.Entity<Course>()
-                .HasMany(p => p.Cohorts)
-                .WithOne(m => m.Course)
-                .HasForeignKey(m => m.CourseId);
+            modelBuilder.Entity<CourseModule>()
+                .HasKey(pm => new { pm.CourseId, pm.CourseId });
 
-            modelBuilder.Entity<Module>()
-                .HasKey(m => m.ModuleId);
+            modelBuilder.Entity<CourseModule>()
+                .HasOne(pm => pm.Course)
+                .WithMany(p => p.CourseModules)
+                .HasForeignKey(pm => pm.CourseId);
+
+            modelBuilder.Entity<CourseModule>()
+                .HasOne(pm => pm.Module)
+                .WithMany(m => m.CourseModules)
+                .HasForeignKey(pm => pm.ModuleId);
+
+            modelBuilder.Entity<Cohort>()
+            .HasKey(c => c.CohortId);
+
+            modelBuilder.Entity<Cohort>()
+            .HasOne(c => c.Course)
+            .WithMany(course => course.Cohorts)
+            .HasForeignKey(c => c.CourseId)
+            .IsRequired(); // This enforces the constraint that a Cohort must have a CourseId
 
             modelBuilder.Entity<Module>()
                 .HasMany(m => m.Assessments)

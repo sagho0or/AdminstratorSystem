@@ -12,9 +12,7 @@
         public string FullName { get; set; }
         public int CohortId { get; set; }
         public Cohort Cohort {  get; set; }
-
-        //TODO value of score? 
-        public int Score { get; set; } = 0;
+        public ICollection<StudentAssessment> StudentAssessments { get; set; }
 
 
     }

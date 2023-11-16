@@ -9,7 +9,6 @@
     public class Cohort
     {
         public int CohortId { get; set; }
-        public int CohortIdentifier { get; set; }
         public string AcademicYear { get; set; }
         public ICollection<Student>? Students { get; set; }
         // Foreign key

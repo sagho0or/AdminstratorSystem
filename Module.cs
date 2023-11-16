@@ -15,7 +15,7 @@ namespace AdministratorSystem
         public string Title { get; set; } = string.Empty;
 
         //TODO Compulsory/optional
-        public bool Isrequired { get; set; }
+        public bool IsRequired { get; set; }
         public int CourseId { get; set; }
 
 

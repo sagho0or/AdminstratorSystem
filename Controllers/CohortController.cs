@@ -18,18 +18,44 @@ namespace AdministratorSystem.Controllers
             _context = context;
         }
 
-
-
-        [HttpPost]
-        public async Task<ActionResult<List<Cohort>>> AddCohort(Cohort cohort)
+        [HttpPost("course/{courseId}")]
+        public ActionResult AddCohort(int courseId, [FromBody] CohortDto cohortDto)
         {
-            _context.Cohort.Add(cohort);
-            await _context.SaveChangesAsync();
+            if (!ModelState.IsValid)
+            {
+                // If the ModelState is not valid based on data annotations, return a BadRequest
+                return BadRequest(ModelState);
+            }
+            var existingCourse = _context.Courses.Find(courseId);
+            if (existingCourse == null)
+            {
+                return NotFound("Course not found");
+            }
 
-            return Ok(await _context.Cohort.ToListAsync());
+            var cohort = new Cohort();
+            cohort.AcademicYear = cohortDto.AcademicYear;
+            cohort.CourseId = courseId;
+            _context.Cohorts.Add(cohort);
+            _context.SaveChanges();
+
+            return Ok("Cohort added to the course successfully");
         }
 
 
+        public ActionResult AddCohortToCourse(int courseId, [FromBody] Cohort cohort)
+        {
+            var existingCourse = _context.Courses.Find(courseId);
+            if (existingCourse == null)
+            {
+                return NotFound("Course not found");
+            }
+
+            cohort.CourseId = courseId;
+            _context.Cohorts.Add(cohort);
+            _context.SaveChanges();
+
+            return Ok("Cohort added to the course successfully");
+        }
         [HttpPost]
         public async Task<ActionResult<Cohort>> AddCohort(int courseId, string academicYear)
         {
