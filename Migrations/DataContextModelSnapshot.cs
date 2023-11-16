@@ -43,7 +43,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Assessment");
+                    b.ToTable("Assessment", (string)null);
                 });
 
             modelBuilder.Entity("AdministratorSystem.Cohort", b =>
@@ -66,7 +66,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Cohort");
+                    b.ToTable("Cohort", (string)null);
                 });
 
             modelBuilder.Entity("AdministratorSystem.Course", b =>
@@ -88,7 +88,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasKey("CourseId");
 
-                    b.ToTable("Course");
+                    b.ToTable("Course", (string)null);
                 });
 
             modelBuilder.Entity("AdministratorSystem.Module", b =>
@@ -114,7 +114,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Module");
+                    b.ToTable("Module", (string)null);
                 });
 
             modelBuilder.Entity("AdministratorSystem.Student", b =>
@@ -123,7 +123,7 @@ namespace AdministratorSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CohortId")
+                    b.Property<int?>("CohortId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FullName")
@@ -141,7 +141,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CohortId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("AdministratorSystem.StudentAssesment", b =>
@@ -166,7 +166,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentAssesments");
+                    b.ToTable("StudentAssesments", (string)null);
                 });
 
             modelBuilder.Entity("AdministratorSystem.Assessment", b =>
@@ -204,13 +204,9 @@ namespace AdministratorSystem.Migrations
 
             modelBuilder.Entity("AdministratorSystem.Student", b =>
                 {
-                    b.HasOne("AdministratorSystem.Cohort", "Cohort")
+                    b.HasOne("AdministratorSystem.Cohort", null)
                         .WithMany("Students")
-                        .HasForeignKey("CohortId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cohort");
+                        .HasForeignKey("CohortId");
                 });
 
             modelBuilder.Entity("AdministratorSystem.StudentAssesment", b =>

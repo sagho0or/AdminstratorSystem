@@ -5,7 +5,7 @@
 namespace AdministratorSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class cohort : Migration
+    public partial class cohort1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -54,8 +54,7 @@ namespace AdministratorSystem.Migrations
                 name: "CohortId",
                 table: "Students",
                 type: "INTEGER",
-                nullable: false,
-                defaultValue: 0);
+                nullable: true);
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Students",
@@ -204,8 +203,7 @@ namespace AdministratorSystem.Migrations
                 table: "Students",
                 column: "CohortId",
                 principalTable: "Cohort",
-                principalColumn: "CohortId",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "CohortId");
         }
 
         /// <inheritdoc />

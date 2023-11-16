@@ -20,12 +20,15 @@ namespace AdministratorSystem.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Cohort>()
+            .HasKey(s => s.CohortId);
+
             modelBuilder.Entity<Student>()
             .HasKey(s => s.StudentId);
 
-            modelBuilder.Entity<Student>()
-                .HasOne(s => s.Cohort)
-                .WithMany(p => p.Students)
+            modelBuilder.Entity<Cohort>()
+                .HasMany(s => s.Students)
+                .WithOne(p => p.Cohort)
                 .HasForeignKey(s => s.CohortId);
 
             modelBuilder.Entity<Course>()
@@ -33,6 +36,11 @@ namespace AdministratorSystem.Data
 
             modelBuilder.Entity<Course>()
                 .HasMany(p => p.Modules)
+                .WithOne(m => m.Course)
+                .HasForeignKey(m => m.CourseId);
+
+            modelBuilder.Entity<Course>()
+                .HasMany(p => p.Cohorts)
                 .WithOne(m => m.Course)
                 .HasForeignKey(m => m.CourseId);
 
@@ -46,14 +54,6 @@ namespace AdministratorSystem.Data
 
             modelBuilder.Entity<Assessment>()
                 .HasKey(a => a.AssessmentId);
-
-            modelBuilder.Entity<Cohort>()
-                .HasKey(c => c.CohortId);
-
-            modelBuilder.Entity<Cohort>()
-                .HasOne(c => c.Course)
-                .WithMany(p => p.Cohorts)
-                .HasForeignKey(c => c.CourseId);
         }
 
 
