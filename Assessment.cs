@@ -26,7 +26,7 @@
             }
         }
         // Foreign key
-        public string? ModuleCode { get; set; }
+        public int ModuleId { get; set; }
         public Module? Module { get; set; }
 
     }

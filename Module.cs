@@ -18,8 +18,6 @@ namespace AdministratorSystem
         public bool Isrequired { get; set; }
         public int CourseId { get; set; }
 
-        // Foreign key
-        public int CouraeId { get; set; }
 
         // Navigation property one to many
         public Course? Course { get; set; }

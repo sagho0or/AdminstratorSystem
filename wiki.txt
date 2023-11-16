@@ -63,3 +63,12 @@ In this example:
 
 The Module class has a collection navigation property Assessments, indicating that it can have multiple assessments associated with it.
 The Assessment class has a foreign key ModuleCode that establishes a relationship with the Module class. The Module property represents the navigation property to the associated module.
+
+
+______________________
+program and cohort : 
+
+The Program class represents a degree program. It contains properties such as ProgramId as the identifier, ProgramTitle for the program name, and DurationInYears to specify its duration.
+It has a collection of Module instances that the program offers and a collection of Cohort instances associated with it.
+The Cohort class represents a group of students registered for a specific Program in a given academic session (AcademicSession). It has a reference to the associated Program and a collection of Student instances who belong to that cohort.
+In this scenario, a Cohort doesn't directly inherit from Program but maintains a relationship with it. Each Cohort is associated with a specific Program, and students are registered within a Cohort under a particular Program.

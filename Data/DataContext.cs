@@ -15,6 +15,7 @@ namespace AdministratorSystem.Data
         public DbSet<Course> Course => Set<Course>();
         public DbSet<Module> Module => Set<Module>();
         public DbSet<Assessment> Assessment => Set<Assessment>();
+        public DbSet<Cohort> Cohort => Set<Cohort>();
         public DbSet<StudentAssesment> StudentAssesments => Set<StudentAssesment>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -23,9 +24,9 @@ namespace AdministratorSystem.Data
             .HasKey(s => s.StudentId);
 
             modelBuilder.Entity<Student>()
-                .HasOne(s => s.Course)
+                .HasOne(s => s.Cohort)
                 .WithMany(p => p.Students)
-                .HasForeignKey(s => s.CourseId);
+                .HasForeignKey(s => s.CohortId);
 
             modelBuilder.Entity<Course>()
                 .HasKey(p => p.CourseId);
@@ -36,12 +37,12 @@ namespace AdministratorSystem.Data
                 .HasForeignKey(m => m.CourseId);
 
             modelBuilder.Entity<Module>()
-                .HasKey(m => m.ModuleCode);
+                .HasKey(m => m.ModuleId);
 
             modelBuilder.Entity<Module>()
                 .HasMany(m => m.Assessments)
                 .WithOne(a => a.Module)
-                .HasForeignKey(a => a.ModuleCode);
+                .HasForeignKey(a => a.ModuleId);
 
             modelBuilder.Entity<Assessment>()
                 .HasKey(a => a.AssessmentId);
