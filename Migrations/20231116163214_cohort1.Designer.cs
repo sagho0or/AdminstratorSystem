@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdministratorSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231116154552_cohort")]
-    partial class cohort
+    [Migration("20231116163214_cohort1")]
+    partial class cohort1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,7 +126,7 @@ namespace AdministratorSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CohortId")
+                    b.Property<int?>("CohortId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FullName")
@@ -207,13 +207,9 @@ namespace AdministratorSystem.Migrations
 
             modelBuilder.Entity("AdministratorSystem.Student", b =>
                 {
-                    b.HasOne("AdministratorSystem.Cohort", "Cohort")
+                    b.HasOne("AdministratorSystem.Cohort", null)
                         .WithMany("Students")
-                        .HasForeignKey("CohortId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cohort");
+                        .HasForeignKey("CohortId");
                 });
 
             modelBuilder.Entity("AdministratorSystem.StudentAssesment", b =>
