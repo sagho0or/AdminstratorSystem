@@ -23,6 +23,7 @@ namespace AdministratorSystem
         public Course? Course { get; set; }
         public ICollection<Assessment>? Assessments { get; set; } = new List<Assessment>(2);
 
+        public ICollection<CourseModule> CourseModules { get; set; }
         // TODO list of one or two
         //public Assignemnt Assignent { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using AdministratorSystem.Data;
+using AdministratorSystem.NewFolder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

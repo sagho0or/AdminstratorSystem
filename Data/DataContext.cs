@@ -20,7 +20,7 @@ namespace AdministratorSystem.Data
         public DbSet<StudentModule> StudentModule => Set<StudentModule>();
         public DbSet<StudentCourse> StudentCourse => Set<StudentCourse>();
         public DbSet<CourseModule> CourseModule => Set<CourseModule>();
-        
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,7 +34,7 @@ namespace AdministratorSystem.Data
                 .HasMany(s => s.Students)
                 .WithOne(p => p.Cohort)
                 .HasForeignKey(s => s.CohortId);
-            
+
             modelBuilder.Entity<Module>()
                 .HasKey(m => m.ModuleId);
 
@@ -50,7 +50,7 @@ namespace AdministratorSystem.Data
                 .HasMaxLength(6); // Assuming the Course identifier is a string of length 6
 
             modelBuilder.Entity<CourseModule>()
-                .HasKey(pm => new { pm.CourseId, pm.CourseId });
+                .HasKey(pm => new { pm.CourseId, pm.ModuleId });
 
             modelBuilder.Entity<CourseModule>()
                 .HasOne(pm => pm.Course)

@@ -1,4 +1,5 @@
 ﻿using AdministratorSystem.Data;
+using AdministratorSystem.NewFolder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,8 +47,9 @@ namespace AdministratorSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Assessment>> GetAssessment(int id)
         {
-            var assessment =  await _context.Assessment.FindAsync(id);
-            if(assessment == null) {
+            var assessment = await _context.Assessment.FindAsync(id);
+            if (assessment == null)
+            {
                 return BadRequest("assessment not found");
             }
             return Ok(assessment);

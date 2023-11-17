@@ -1,4 +1,6 @@
-﻿namespace AdministratorSystem.NewFolder
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AdministratorSystem.NewFolder
 {
     public class CohortDto
     {

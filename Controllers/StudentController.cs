@@ -18,28 +18,28 @@ namespace AdministratorSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<List<Student>>> AddStudent(int cohortId, string fullname)
         {
-                // Check if the cohort exists
-                var cohort = _context.Cohort.Find(cohortId);
-                if (cohort == null)
-                {
-                    return NotFound("Cohort not found");
-                }
+            // Check if the cohort exists
+            var cohort = _context.Cohort.Find(cohortId);
+            if (cohort == null)
+            {
+                return NotFound("Cohort not found");
+            }
 
-                string uniqueDigits = GenerateUniqueDigits();
+            string uniqueDigits = GenerateUniqueDigits();
 
-                // Create a new student
-                var newStudent = new Student
-                    {
-                        CohortId = cohortId,
-                        FullName = fullname,
-                        StundetIdentifier = $"{cohort.AcademicYear}{uniqueDigits}"
-                };
+            // Create a new student
+            var newStudent = new Student
+            {
+                CohortId = cohortId,
+                FullName = fullname,
+                StundetIdentifier = $"{cohort.AcademicYear}{uniqueDigits}"
+            };
 
-                _context.Students.Add(newStudent);
-                await _context.SaveChangesAsync();
+            _context.Students.Add(newStudent);
+            await _context.SaveChangesAsync();
 
-                return Ok(await _context.Students.ToListAsync());
-            
+            return Ok(await _context.Students.ToListAsync());
+
         }
 
         [HttpPost("{studentId}/{cohortId}")]
@@ -99,16 +99,16 @@ namespace AdministratorSystem.Controllers
                 var mark = module.Mark;
                 var result = module.Result;
 
-                if (mark)
+                if (mark.HasValue)
                 {
                     // Logic to calculate total marks from course
-                    totalMarks += mark; 
+                    totalMarks += mark.Value;
                 }
                 numberOfModules++;
 
             }
             // Calculate the average marks for the module
-            if (numberOfModules > 0 && totalMarks !== null)
+            if (numberOfModules > 0 && totalMarks != null)
             {
                 double averageMark = totalMarks / numberOfModules;
 
@@ -155,7 +155,7 @@ namespace AdministratorSystem.Controllers
             }
             else
             {
-                var moduleResult;
+                string moduleResult;
 
                 if (!moduleMark.HasValue)
                 {
@@ -178,14 +178,14 @@ namespace AdministratorSystem.Controllers
                 var studentModule = new StudentModule
                 {
                     ModuleId = moduleId,
-                    studentId = studentId,
+                    StudentId = studentId,
                     Mark = moduleMark,
-                    Results = moduleResult
-                }
+                    Result = moduleResult
+                };
             }
 
             // Add the mark for the student's assessment
-            var studentAssessment = new StudentAssessment
+            var studentAssessment = new StudentAssesment
             {
                 Mark = mark,
                 AssessmentId = assessmentId,
