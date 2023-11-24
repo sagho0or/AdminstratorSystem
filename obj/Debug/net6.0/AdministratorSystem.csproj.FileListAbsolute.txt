@@ -318,3 +318,4 @@ C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\obj\De
 C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\obj\Debug\net6.0\AdministratorSystem.pdb
 C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\obj\Debug\net6.0\AdministratorSystem.genruntimeconfig.cache
 C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\obj\Debug\net6.0\ref\AdministratorSystem.dll
+C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\obj\Debug\net6.0\AdministratorSystem.sourcelink.json

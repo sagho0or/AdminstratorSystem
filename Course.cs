@@ -9,14 +9,13 @@
         public int CourseId { get; set; }
         //begin with the year of the cohort - unique 6 digit
         public string CourseIdentifier { get; set; } = string.Empty;
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         public int DurationInYears { get; set; }
 
         // Collection navigation property
-        public ICollection<Module>? Modules { get; set; }
-
-        // Collection navigation property
         public ICollection<Cohort>? Cohorts { get; set; }
-        public ICollection<CourseModule> CourseModules { get; set; }
+        public ICollection<CourseModule> CourseModules { get; set; } = new List<CourseModule>();
+
+        public ICollection<StudentCourse> StudentCourses { get; set; }
     }
 }

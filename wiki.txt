@@ -72,3 +72,11 @@ The Program class represents a degree program. It contains properties such as Pr
 It has a collection of Module instances that the program offers and a collection of Cohort instances associated with it.
 The Cohort class represents a group of students registered for a specific Program in a given academic session (AcademicSession). It has a reference to the associated Program and a collection of Student instances who belong to that cohort.
 In this scenario, a Cohort doesn't directly inherit from Program but maintains a relationship with it. Each Cohort is associated with a specific Program, and students are registered within a Cohort under a particular Program.
+
+
+In your scenario:
+
+A Student can be associated with multiple Modules.
+A Module is part of a Course.
+A Course has many Modules.
+A Student has a mark and result associated with each Module and the Course.

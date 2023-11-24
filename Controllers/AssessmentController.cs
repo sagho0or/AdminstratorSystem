@@ -17,7 +17,7 @@ namespace AdministratorSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Course>>> AddAssessment(AssessmentDto assessmentDto)
+        public async Task<ActionResult<List<Assessment>>> AddAssessment(AssessmentDto assessmentDto)
         {
 
             if (!ModelState.IsValid)
@@ -26,11 +26,12 @@ namespace AdministratorSystem.Controllers
                 return BadRequest(ModelState);
             }
 
-            var assessment = new Assessment();
-            assessment.Title = assessmentDto.Title;
-            assessment.Description = assessmentDto.Description;
-            assessment.Title = assessmentDto.Title;
-            assessment.MaximumMark = assessmentDto.MaximumMark;
+            var assessment = new Assessment {
+                Title = assessmentDto.Title,
+                Description = assessmentDto.Description,
+                AssessmentId = new Random().Next(1000, 9999),
+            };
+
 
             _context.Assessment.Add(assessment);
             await _context.SaveChangesAsync();

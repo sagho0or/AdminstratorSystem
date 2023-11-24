@@ -14,6 +14,8 @@
         public Cohort Cohort {  get; set; }
         public ICollection<StudentAssessment> StudentAssessments { get; set; }
 
+        public ICollection<StudentModule> StudentModules { get; set; }
+        public ICollection<StudentCourse> StudentCourses { get; set; }
 
     }
 }

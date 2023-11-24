@@ -19,23 +19,18 @@ namespace AdministratorSystem.Migrations
 
             modelBuilder.Entity("AdministratorSystem.Assessment", b =>
                 {
-                    b.Property<string>("AssessmentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("Mark")
+                    b.Property<int>("AssessmentId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("MaxMark")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ModuleId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Title")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("description")
+                    b.Property<int?>("ModuleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -43,7 +38,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Assessment", (string)null);
+                    b.ToTable("Assessment");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Cohort", b =>
@@ -56,9 +51,6 @@ namespace AdministratorSystem.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CohortIdentifier")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("CourseId")
                         .HasColumnType("INTEGER");
 
@@ -66,7 +58,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Cohort", (string)null);
+                    b.ToTable("Cohort");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Course", b =>
@@ -77,18 +69,37 @@ namespace AdministratorSystem.Migrations
 
                     b.Property<string>("CourseIdentifier")
                         .IsRequired()
+                        .HasMaxLength(6)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("DurationInYears")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("CourseId");
 
-                    b.ToTable("Course", (string)null);
+                    b.ToTable("Course");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.CourseModule", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("CourseId", "ModuleId");
+
+                    b.HasIndex("ModuleId");
+
+                    b.ToTable("CourseModule");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Module", b =>
@@ -97,13 +108,17 @@ namespace AdministratorSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CourseId")
+                    b.Property<int?>("AssessmentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("Isrequired")
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRequired")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ModuleCode")
+                        .HasMaxLength(5)
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
@@ -112,9 +127,29 @@ namespace AdministratorSystem.Migrations
 
                     b.HasKey("ModuleId");
 
+                    b.HasIndex("AssessmentId");
+
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Module", (string)null);
+                    b.ToTable("Module");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.ModuleAssessment", b =>
+                {
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AssessmentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaxMark")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ModuleId", "AssessmentId");
+
+                    b.HasIndex("AssessmentId");
+
+                    b.ToTable("ModuleAssessment");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Student", b =>
@@ -123,15 +158,12 @@ namespace AdministratorSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CohortId")
+                    b.Property<int>("CohortId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("StundetIdentifier")
                         .IsRequired()
@@ -141,41 +173,92 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CohortId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("AdministratorSystem.StudentAssesment", b =>
+            modelBuilder.Entity("AdministratorSystem.StudentAssessment", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AssessmentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Mark")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("AssessmentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("StudentAssessments");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.StudentCourse", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("AssessmentId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Score")
+                    b.Property<int>("CourseId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Mark")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssessmentId");
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentAssesments", (string)null);
+                    b.ToTable("StudentCourse");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.StudentModule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Mark")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModuleId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("StudentModule");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Assessment", b =>
                 {
                     b.HasOne("AdministratorSystem.Module", "Module")
-                        .WithMany("Assessments")
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("ModuleId");
 
                     b.Navigation("Module");
                 });
@@ -191,34 +274,78 @@ namespace AdministratorSystem.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("AdministratorSystem.Module", b =>
+            modelBuilder.Entity("AdministratorSystem.CourseModule", b =>
                 {
                     b.HasOne("AdministratorSystem.Course", "Course")
-                        .WithMany("Modules")
+                        .WithMany("CourseModules")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AdministratorSystem.Module", "Module")
+                        .WithMany("CourseModules")
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Course");
+
+                    b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.Module", b =>
+                {
+                    b.HasOne("AdministratorSystem.Assessment", null)
+                        .WithMany("Modules")
+                        .HasForeignKey("AssessmentId");
+
+                    b.HasOne("AdministratorSystem.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.ModuleAssessment", b =>
+                {
+                    b.HasOne("AdministratorSystem.Assessment", "Assessment")
+                        .WithMany("ModuleAssessments")
+                        .HasForeignKey("AssessmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AdministratorSystem.Module", "Module")
+                        .WithMany("ModuleAssessments")
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assessment");
+
+                    b.Navigation("Module");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Student", b =>
                 {
-                    b.HasOne("AdministratorSystem.Cohort", null)
+                    b.HasOne("AdministratorSystem.Cohort", "Cohort")
                         .WithMany("Students")
-                        .HasForeignKey("CohortId");
+                        .HasForeignKey("CohortId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cohort");
                 });
 
-            modelBuilder.Entity("AdministratorSystem.StudentAssesment", b =>
+            modelBuilder.Entity("AdministratorSystem.StudentAssessment", b =>
                 {
                     b.HasOne("AdministratorSystem.Assessment", "Assessment")
-                        .WithMany()
+                        .WithMany("StudentAssessments")
                         .HasForeignKey("AssessmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AdministratorSystem.Student", "Student")
-                        .WithMany()
+                        .WithMany("StudentAssessments")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -226,6 +353,53 @@ namespace AdministratorSystem.Migrations
                     b.Navigation("Assessment");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.StudentCourse", b =>
+                {
+                    b.HasOne("AdministratorSystem.Course", "Course")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AdministratorSystem.Student", "Student")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.StudentModule", b =>
+                {
+                    b.HasOne("AdministratorSystem.Module", "Module")
+                        .WithMany("StudentModules")
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AdministratorSystem.Student", "Student")
+                        .WithMany("StudentModules")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Module");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.Assessment", b =>
+                {
+                    b.Navigation("ModuleAssessments");
+
+                    b.Navigation("Modules");
+
+                    b.Navigation("StudentAssessments");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Cohort", b =>
@@ -237,12 +411,27 @@ namespace AdministratorSystem.Migrations
                 {
                     b.Navigation("Cohorts");
 
-                    b.Navigation("Modules");
+                    b.Navigation("CourseModules");
+
+                    b.Navigation("StudentCourses");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Module", b =>
                 {
-                    b.Navigation("Assessments");
+                    b.Navigation("CourseModules");
+
+                    b.Navigation("ModuleAssessments");
+
+                    b.Navigation("StudentModules");
+                });
+
+            modelBuilder.Entity("AdministratorSystem.Student", b =>
+                {
+                    b.Navigation("StudentAssessments");
+
+                    b.Navigation("StudentCourses");
+
+                    b.Navigation("StudentModules");
                 });
 #pragma warning restore 612, 618
         }

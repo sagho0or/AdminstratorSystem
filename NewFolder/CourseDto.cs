@@ -9,5 +9,6 @@ namespace AdministratorSystem.NewFolder
 
         [Range(1, 3, ErrorMessage = "Duration in Years should be between 1 and 3")]
         public int DurationInYears { get; set; }
+
     }
 }

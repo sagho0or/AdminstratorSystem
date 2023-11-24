@@ -34,12 +34,48 @@ namespace AdministratorSystem.Controllers
             return Ok(await _context.Module.ToListAsync());
         }
 
-        [HttpPost("{moduleId}/{assesmentId}")]
-        public async Task AsssignAssesment(int moduleId, int assessmentId)
+        [HttpPost("assign-assesment")]
+        public async Task<ActionResult<Module>> AsssignAssesment(ModuleAssessmentDto moduleAssessmentDto)
         {
-            var module = await _context.Module.FindAsync(moduleId);
 
-            module.Assessments.Add(_context.Assessment.Find(assessmentId));
+            if (!ModelState.IsValid)
+            {
+                // If the ModelState is not valid based on data annotations, return a BadRequest
+                return BadRequest(ModelState);
+            }
+
+            var module = await _context.Module
+                .Include(m => m.ModuleAssessments)
+                .FirstOrDefaultAsync(m => m.ModuleId == moduleAssessmentDto.ModuleId);
+
+            if (module == null)
+            {
+                return NotFound("Module not found");
+            }
+
+            // Calculate the sum of existing maximum marks for assessments in this module
+            int currentSumOfMaxMarks = module.ModuleAssessments.Sum(ma => ma.MaxMark);
+
+            // Check if adding the new assessment will exceed the maximum limit of 100
+            if (currentSumOfMaxMarks + moduleAssessmentDto.MaxMark > 100)
+            {
+                return BadRequest("Adding this assessment would exceed the maximum limit of 100 marks for this module");
+            }
+
+
+            var moduleAssessment = new ModuleAssessment
+            {
+                ModuleId = moduleAssessmentDto.ModuleId,
+                AssessmentId = moduleAssessmentDto.AssessmentId,
+                MaxMark = moduleAssessmentDto.MaxMark
+            };
+
+            _context.ModuleAssessment.Add(moduleAssessment);
+            await _context.SaveChangesAsync();
+
+
+            return Ok(await _context.ModuleAssessment.ToListAsync());
+
         }
 
 
@@ -52,7 +88,10 @@ namespace AdministratorSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Module>> GetModule(int id)
         {
-            var module = await _context.Module.FindAsync(id);
+            var module = await _context.Module
+                .Include(c => c.ModuleAssessments) // Include the CourseModules
+                    .ThenInclude(cm => cm.Assessment) // Include the Module entity in CourseModules
+                .FirstOrDefaultAsync(c => c.ModuleId == id);
             if (module == null)
             {
                 return BadRequest("student not found");
