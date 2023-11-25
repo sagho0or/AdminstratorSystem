@@ -45,7 +45,7 @@ namespace AdministratorSystem.Controllers
             {
                 CohortId = cohortId,
                 FullName = fullname,
-                StundetIdentifier = $"{cohort.AcademicYear}{uniqueDigits}"
+                StudentId = int.Parse($"{cohort.AcademicYear}{uniqueDigits}")
             };
 
             _context.Students.Add(newStudent);
@@ -59,6 +59,7 @@ namespace AdministratorSystem.Controllers
                         .ThenInclude(course => course.CourseModules)
                             .ThenInclude(cm => cm.Module)
                                 .ThenInclude(m => m.ModuleAssessments)
+                                .ThenInclude(m => m.Assessment)
                 .FirstOrDefaultAsync(s => s.StudentId == newStudent.StudentId);
 
 
@@ -102,7 +103,7 @@ namespace AdministratorSystem.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(await _context.Students.ToListAsync());
+            return Ok(addedStudent);
 
         }
 
@@ -117,14 +118,8 @@ namespace AdministratorSystem.Controllers
         [HttpGet("getStudent/cohort/{cohortId}")]
         public async Task<ActionResult<List<Student>>> GetStudents(int cohortId)
         {
-             var cohort = await _context.Cohort
+            var cohort = await _context.Cohort
                 .Include(c => c.Students) // Include the Students
-                    .ThenInclude(s => s.StudentAssessments) // Include StudentAssessments
-                        .ThenInclude(sa => sa.Assessment) // Include Assessments
-                .Include(c => c.Students) // Include the Students
-                    .ThenInclude(s => s.StudentModules) // Include StudentModules
-                .Include(c => c.Students) // Include the Students
-                    .ThenInclude(s => s.StudentCourses) // Include StudentCourses
                 .FirstOrDefaultAsync(c => c.CohortId == cohortId);
 
             if (cohort == null)
@@ -132,45 +127,7 @@ namespace AdministratorSystem.Controllers
                 return NotFound();
             }
 
-            // Extract students
-            var students = cohort.Students.ToList();
-
-            // Map the retrieved data to a DTO or ViewModel to avoid circular reference issues
-            var studentsDto = students.Select(student =>
-            {
-                // Map student details
-                var studentDto = new
-                {
-                    student.StudentId,
-                    student.FullName,
-                    student.CohortId,
-                    // Include assessment marks for each student
-                    Assessments = student.StudentAssessments.Select(sa => new
-                    {
-                        sa.Assessment.Title,
-                        sa.Mark
-                    }).ToList(),
-                    // Include module marks and results for each student
-                    Modules = student.StudentModules.Select(sm => new
-                    {
-                        sm.Module.ModuleId,
-                        sm.Module.Title,
-                        sm.Mark,
-                        sm.Result
-                    }).ToList(),
-                    // Include course marks and results for each student
-                    Courses = student.StudentCourses.Select(sc => new
-                    {
-                        sc.Course.CourseId,
-                        sc.Course.Title,
-                        sc.Mark,
-                        sc.Result
-                    }).ToList()
-                };
-                return studentDto;
-            }).ToList();
-
-            return Ok(studentsDto);
+            return Ok(cohort);
         }
 
         [HttpGet("{id}")]
@@ -183,70 +140,42 @@ namespace AdministratorSystem.Controllers
                 return BadRequest("student not found");
             }
 
-            // Calculate the average of modules marks
-            int? totalMarks = 0;
-            int numberOfModules = 0;
-
-
-            var existingModules = _context.StudentModule.Where(sa => sa.StudentId == student.StudentId);
-
-
-            foreach (var module in existingModules)
-            {
-                var mark = module.Mark;
-                var result = module.Result;
-
-                if (mark != null)
-                {
-                    // Logic to calculate total marks from course
-                    totalMarks += mark ?? 0; 
-                }
-                numberOfModules++;
-
-            }
-            // Calculate the average marks for the module
-            if (numberOfModules > 0 && totalMarks != null)
-            {
-                double averageMark = numberOfModules > 0 ? (double)totalMarks / numberOfModules : 0.0;
-
-                var studentCourse = await _context.StudentCourse
-                    .FirstOrDefaultAsync(sp => sp.StudentId == student.StudentId);
-
-                if (studentCourse != null)
-                {
-                    studentCourse.Mark = (int)Math.Round(averageMark);
-                    _context.StudentCourse.Update(studentCourse);
-                    await _context.SaveChangesAsync(); 
-                }
-            }
-
             var finalResult = await _context.Students
-                .Include(c => c.Cohort) // Include the Students
-                    .ThenInclude(c => c.Course) // Include the Course
-                    .ThenInclude(c => c.CourseModules)
-                    .ThenInclude(c => c.Module) 
-                    .ThenInclude(c => c.ModuleAssessments) 
-                    .ThenInclude(c => c.Assessment) 
+
+                .Include(c => c.StudentCourses) 
+                    .ThenInclude(c => c.Course) 
+                .Include(c => c.StudentModules) 
+                    .ThenInclude(c => c.Module)
+                    .ThenInclude(c => c.ModuleAssessments)
+                    .ThenInclude(c => c.Assessment)
+                .Include(c => c.StudentAssessments) 
                 .FirstOrDefaultAsync(c => c.StudentId == id);
             return Ok(finalResult);
         }
 
         [HttpPost("AddMark/{studentId}/assessments/{assessmentId}")]
-        public async Task<ActionResult> AddMarkToAssessment(int studentId, int assessmentId, int mark)
+        public async Task<ActionResult> AddMarkToAssessment(int studentId, int assessmentId, int moduleId,  int mark)
         {
             var student = await _context.Students
-                .Include(s => s.StudentAssessments)
                 .Include(s => s.StudentCourses)
                 .Include(s => s.StudentModules)
                     .ThenInclude(sm => sm.Module)
-                        .ThenInclude(m => m.ModuleAssessments)
+                    .ThenInclude(m => m.ModuleAssessments)
+                    .ThenInclude(m => m.Assessment)
+                .Include(s => s.StudentAssessments)
                 .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
 
             if (student == null)
             {
                 return NotFound("Student not found");
             }
+            var specificModule = student.StudentModules.FirstOrDefault(sm => sm.ModuleId == moduleId)?.Module;
 
+            if (specificModule == null)
+            {
+                return BadRequest("Student is not associated with the specified module");
+            }
             var assessment = student.StudentAssessments.FirstOrDefault(sa => sa.AssessmentId == assessmentId);
 
             if (assessment == null)
@@ -254,17 +183,23 @@ namespace AdministratorSystem.Controllers
                 return NotFound("Assessment not found for this student");
             }
 
-            var maxMarkForAssessment = await _context.ModuleAssessment
-                .Where(ma => ma.AssessmentId == assessmentId)
-                .Select(ma => ma.MaxMark)
-                .FirstOrDefaultAsync();
+
+            var moduleAssessment = specificModule.ModuleAssessments.FirstOrDefault(ma => ma.AssessmentId == assessmentId);
+
+            if (moduleAssessment == null)
+            {
+                return BadRequest("Assessment not found for this module");
+            }
+
+            var maxMarkForAssessment = moduleAssessment.MaxMark;
 
             if (mark > maxMarkForAssessment)
             {
-                return BadRequest($"The Maximum mark for this assessment is {maxMarkForAssessment}");
+                return BadRequest($"The Maximum mark for this assessment in this module is {maxMarkForAssessment}");
             }
 
-            assessment.Mark = mark;
+            moduleAssessment.Assessment.StudentAssessments.FirstOrDefault(sm => sm.AssessmentId == assessmentId).Mark = mark;
+            
 
             await _context.SaveChangesAsync();
 
@@ -281,8 +216,9 @@ namespace AdministratorSystem.Controllers
                     {
                         var assesId = asses.AssessmentId;
 
-                        var correspondingAssessment = student.StudentAssessments
-                            .FirstOrDefault(sa => sa.AssessmentId == assesId);
+                        var corresponding = module.ModuleAssessments.FirstOrDefault(ma => ma.AssessmentId == assesId);
+
+                        var correspondingAssessment = corresponding.Assessment.StudentAssessments.FirstOrDefault(sm => sm.AssessmentId == assessmentId);
 
                         if (correspondingAssessment != null)
                         {
@@ -356,8 +292,8 @@ namespace AdministratorSystem.Controllers
 
                 await _context.SaveChangesAsync();
             }
-
-            return Ok("Mark added successfully");
+            
+            return Ok(student);
         }
 
     }

@@ -26,6 +26,7 @@ namespace AdministratorSystem.Controllers
             var course = new Course();
             course.DurationInYears = durationInYears;
             course.Title = title;
+            course.CourseId = GenerateUniqueCourseId();
 
 
             _context.Course.Add(course);
@@ -39,7 +40,10 @@ namespace AdministratorSystem.Controllers
         public async Task<ActionResult<Course>> assignModule(int courseId, int moduleId, bool IsRequired)
         {
 
-            var course = _context.Course.FirstOrDefault(p => p.CourseId == courseId);
+            var course = _context.Course
+                .Include(c => c.CourseModules)
+                .FirstOrDefault(c => c.CourseId == courseId);
+
             if (course != null)
             {
 
@@ -57,7 +61,7 @@ namespace AdministratorSystem.Controllers
                 if (module != null)
                 {
                     course.CourseModules.Add(new CourseModule { 
-                        CourseId = courseId, 
+                        CourseId = courseId,
                         ModuleId = module.ModuleId,
                         IsRequired = module.IsRequired
                     });
@@ -97,6 +101,27 @@ namespace AdministratorSystem.Controllers
             return Ok(course);
         }
 
+
+        private int GenerateUniqueCourseId()
+        {
+            Random random = new Random();
+            int maxAttempts = 100000; // Define a maximum number of attempts to generate a unique number
+            int uniqueCode;
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                uniqueCode = random.Next(100000, 999999); 
+
+                var existingModule = _context.Course.FirstOrDefault(m => m.CourseId == uniqueCode);
+
+                if (existingModule == null)
+                {
+                    return uniqueCode;
+                }
+            }
+
+            throw new Exception("Failed to generate a unique CourseId .");
+        }
 
     }
 }

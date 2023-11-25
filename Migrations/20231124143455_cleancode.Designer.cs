@@ -3,6 +3,7 @@ using System;
 using AdministratorSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdministratorSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231124143455_cleancode")]
+    partial class cleancode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
@@ -101,7 +104,6 @@ namespace AdministratorSystem.Migrations
                 {
                     b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(5)
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("AssessmentId")
@@ -111,6 +113,10 @@ namespace AdministratorSystem.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsRequired")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ModuleCode")
+                        .HasMaxLength(5)
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
@@ -154,6 +160,10 @@ namespace AdministratorSystem.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StundetIdentifier")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

@@ -15,6 +15,7 @@ namespace AdministratorSystem.Controllers
         {
             _context = context;
         }
+        
 
         [HttpPost]
         public async Task<ActionResult<List<Module>>> AddModule(ModuleDto moduleDto)
@@ -25,7 +26,7 @@ namespace AdministratorSystem.Controllers
                 return BadRequest(ModelState);
             }
             var module = new Module();
-            module.ModuleCode = moduleDto.Code;
+            module.ModuleId = GenerateUniqueModuleId();
             module.Title = moduleDto.Title;
 
             _context.Module.Add(module);
@@ -97,6 +98,27 @@ namespace AdministratorSystem.Controllers
                 return BadRequest("student not found");
             }
             return Ok(module);
+        }
+        private int GenerateUniqueModuleId()
+        {
+            Random random = new Random();
+            int maxAttempts = 10000; 
+            int uniqueCode;
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                uniqueCode = random.Next(10000, 99999); 
+
+               
+                var existingModule = _context.Module.FirstOrDefault(m => m.ModuleId == uniqueCode);
+
+                if (existingModule == null)
+                {
+                    return uniqueCode;
+                }
+            }
+
+            throw new Exception("Failed to generate a unique ModuleId.");
         }
     }
 }

@@ -40,15 +40,11 @@ namespace AdministratorSystem.Data
                 .HasKey(m => m.ModuleId);
 
             modelBuilder.Entity<Module>()
-                .Property(m => m.ModuleCode)
+                .Property(m => m.ModuleId)
                 .HasMaxLength(5); // Assuming the module code is a string of length 5
 
             modelBuilder.Entity<Course>()
                 .HasKey(p => p.CourseId);
-
-            modelBuilder.Entity<Course>()
-                .Property(p => p.CourseIdentifier)
-                .HasMaxLength(6); // Assuming the Course identifier is a string of length 6
 
             modelBuilder.Entity<CourseModule>()
                 .HasKey(pm => new { pm.CourseId, pm.ModuleId });
