@@ -75,7 +75,7 @@ namespace AdministratorSystem.Controllers
             await _context.SaveChangesAsync();
 
 
-            return Ok(await _context.ModuleAssessment.ToListAsync());
+            return Ok(moduleAssessment);
 
         }
 
