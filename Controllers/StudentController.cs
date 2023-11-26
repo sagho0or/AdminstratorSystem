@@ -142,19 +142,19 @@ namespace AdministratorSystem.Controllers
 
             var finalResult = await _context.Students
 
-                .Include(c => c.StudentCourses) 
-                    .ThenInclude(c => c.Course) 
-                .Include(c => c.StudentModules) 
+                .Include(c => c.StudentCourses)
+                    .ThenInclude(c => c.Course)
+                .Include(c => c.StudentModules)
                     .ThenInclude(c => c.Module)
                     .ThenInclude(c => c.ModuleAssessments)
                     .ThenInclude(c => c.Assessment)
-                .Include(c => c.StudentAssessments) 
+                .Include(c => c.StudentAssessments)
                 .FirstOrDefaultAsync(c => c.StudentId == id);
             return Ok(finalResult);
         }
 
         [HttpPost("AddMark/{studentId}/assessments/{assessmentId}")]
-        public async Task<ActionResult> AddMarkToAssessment(int studentId, int assessmentId, int moduleId,  int mark)
+        public async Task<ActionResult> AddMarkToAssessment(int studentId, int assessmentId, int moduleId, int mark)
         {
             var student = await _context.Students
                 .Include(s => s.StudentCourses)
@@ -198,16 +198,17 @@ namespace AdministratorSystem.Controllers
                 return BadRequest($"The Maximum mark for this assessment in this module is {maxMarkForAssessment}");
             }
 
-            moduleAssessment.Assessment.StudentAssessments.FirstOrDefault(sm => sm.AssessmentId == assessmentId).Mark = mark;
-            
+            moduleAssessment.Assessment.StudentAssessments.FirstOrDefault(sm => sm.AssessmentId == assessmentId && sm.ModuleId == moduleId).Mark = mark;
+
 
             await _context.SaveChangesAsync();
 
-            var CalculateModuleMark = 0;
+
 
             // Calculate module marks and update results for modules
             foreach (var module in student.StudentModules.Select(cm => cm.Module))
             {
+                var CalculateModuleMark = 0;
                 var moduleAssessments = module.ModuleAssessments;
 
                 if (moduleAssessments != null && moduleAssessments.Any())
@@ -218,7 +219,7 @@ namespace AdministratorSystem.Controllers
 
                         var corresponding = module.ModuleAssessments.FirstOrDefault(ma => ma.AssessmentId == assesId);
 
-                        var correspondingAssessment = corresponding.Assessment.StudentAssessments.FirstOrDefault(sm => sm.AssessmentId == assessmentId);
+                        var correspondingAssessment = corresponding.Assessment.StudentAssessments.FirstOrDefault(sm => sm.AssessmentId == assessmentId && sm.ModuleId == moduleAssessment.ModuleId);
 
                         if (correspondingAssessment != null)
                         {
@@ -292,7 +293,7 @@ namespace AdministratorSystem.Controllers
 
                 await _context.SaveChangesAsync();
             }
-            
+
             return Ok(student);
         }
 
