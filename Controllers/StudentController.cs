@@ -136,28 +136,120 @@ namespace AdministratorSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
-            var student = await _context.Students.FindAsync(id);
+            var isStudent = await _context.Students.FindAsync(id);
 
-            if (student == null)
+            if (isStudent == null)
             {
                 return BadRequest("student not found");
             }
 
-            var studentDetails = await _context.Students
+            var student = await _context.Students
                 .Include(s => s.Cohort)
                     .ThenInclude(m => m.Course)
-                .Include(c => c.StudentCourses)
-                    .ThenInclude(c => c.Course)
-                .Include(c => c.StudentModules)
-                    .ThenInclude(c => c.Module)
-                    .ThenInclude(c => c.ModuleAssessments)
-                    .ThenInclude(c => c.Assessment)
-                .Include(c => c.StudentAssessments)
-                .FirstOrDefaultAsync(c => c.StudentId == id);
+                .Include(s => s.StudentCourses)
+                .Include(s => s.StudentModules)
+                    .ThenInclude(sm => sm.Module)
+                    .ThenInclude(m => m.ModuleAssessments)
+                    .ThenInclude(m => m.Assessment)
+                .Include(s => s.StudentAssessments)
+                .FirstOrDefaultAsync(s => s.StudentId == id);
+
+            var modulesForCourse = new List<StudentModuleDto>();
 
 
+            // Calculate module marks and update results for modules
+            foreach (var module in student.StudentModules.Select(cm => cm.Module))
+            {
+                var moduleAssessments = module.ModuleAssessments;
+                var moduleAssessmentsDto = new List<StudentAssessmentDto>();
 
-            return Ok(studentDetails);
+                if (moduleAssessments != null && moduleAssessments.Any())
+                {
+                    foreach (var asses in moduleAssessments)
+                    {
+                        var assesId = asses.AssessmentId;
+
+                        var correspondingAssessment = asses.Assessment.StudentAssessments.FirstOrDefault(sm => sm.ModuleId == module.ModuleId);
+
+                        if (correspondingAssessment != null)
+                        {
+
+                            moduleAssessmentsDto.Add(new StudentAssessmentDto
+                            {
+                                AssessmentId = correspondingAssessment.AssessmentId,
+                                Title = asses.Assessment.Title,
+                                Mark = correspondingAssessment.Mark
+                            });
+                        }
+
+                    }
+
+                    var studentModule = _context.StudentModule
+                        .FirstOrDefault(sm => sm.StudentId == student.StudentId && sm.ModuleId == module.ModuleId);
+
+                    if (studentModule == null)
+                    {
+                        studentModule = new StudentModule
+                        {
+                            StudentId = student.StudentId,
+                            ModuleId = module.ModuleId
+                        };
+                        _context.StudentModule.Add(studentModule);
+                    }
+
+                    var studentModuleDto = new StudentModuleDto
+                    {
+                        ModuleId = module.ModuleId,
+                        Mark = (int)studentModule.Mark,
+                        Result = studentModule.Result,
+                        Title = module.Title,
+                        Assessments = moduleAssessmentsDto
+                    };
+
+                    modulesForCourse.Add(studentModuleDto);
+
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    var studentModule = _context.StudentModule
+                        .FirstOrDefault(sm => sm.StudentId == student.StudentId && sm.ModuleId == module.ModuleId);
+
+                    if (studentModule != null)
+                    {
+
+                        var studentModuleDto = new StudentModuleDto
+                        {
+                            ModuleId = module.ModuleId,
+                            Mark = (int)studentModule.Mark,
+                            Result = studentModule.Result,
+                            Title = module.Title,
+                            Assessments = moduleAssessmentsDto
+                        };
+
+                        modulesForCourse.Add(studentModuleDto);
+                    }
+
+
+                }
+            }
+            var course = student.StudentCourses.FirstOrDefault();
+            var finalResult = new StudentDto
+            {
+                StudentId = student.StudentId,
+                FullName = student.FullName,
+                Course = new StudentCourseDto
+                {
+                    CourseId = student.Cohort.Course.CourseId,
+                    Title = student.Cohort.Course.Title,
+                    Mark = course.Mark,
+                    Result = course.Result,
+                    Modules = modulesForCourse
+                }
+            };
+
+
+            return Ok(finalResult);
         }
 
         [HttpPost("AddMark/{studentId}/assessments/{assessmentId}")]
