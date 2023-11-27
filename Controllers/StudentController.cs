@@ -1,5 +1,6 @@
 ﻿using AdministratorSystem.Data;
 using AdministratorSystem.Migrations;
+using AdministratorSystem.NewFolder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -94,6 +95,8 @@ namespace AdministratorSystem.Controllers
                         {
                             StudentId = addedStudent.StudentId,
                             AssessmentId = moduleAssessment.AssessmentId,
+                            Module = moduleAssessment.Module,
+                            ModuleId = moduleAssessment.ModuleId,
                             Mark = null // Set as null initially
                         };
                         _context.StudentAssessments.Add(studentAssessment);
@@ -140,8 +143,9 @@ namespace AdministratorSystem.Controllers
                 return BadRequest("student not found");
             }
 
-            var finalResult = await _context.Students
-
+            var studentDetails = await _context.Students
+                .Include(s => s.Cohort)
+                    .ThenInclude(m => m.Course)
                 .Include(c => c.StudentCourses)
                     .ThenInclude(c => c.Course)
                 .Include(c => c.StudentModules)
@@ -150,13 +154,18 @@ namespace AdministratorSystem.Controllers
                     .ThenInclude(c => c.Assessment)
                 .Include(c => c.StudentAssessments)
                 .FirstOrDefaultAsync(c => c.StudentId == id);
-            return Ok(finalResult);
+
+
+
+            return Ok(studentDetails);
         }
 
         [HttpPost("AddMark/{studentId}/assessments/{assessmentId}")]
         public async Task<ActionResult> AddMarkToAssessment(int studentId, int assessmentId, int moduleId, int mark)
         {
             var student = await _context.Students
+                .Include(s => s.Cohort)
+                    .ThenInclude(m => m.Course)
                 .Include(s => s.StudentCourses)
                 .Include(s => s.StudentModules)
                     .ThenInclude(sm => sm.Module)
@@ -203,13 +212,15 @@ namespace AdministratorSystem.Controllers
 
             await _context.SaveChangesAsync();
 
-
+            var modulesForCourse = new List<StudentModuleDto>();
+            
 
             // Calculate module marks and update results for modules
             foreach (var module in student.StudentModules.Select(cm => cm.Module))
             {
                 var CalculateModuleMark = 0;
                 var moduleAssessments = module.ModuleAssessments;
+                var moduleAssessmentsDto = new List<StudentAssessmentDto>();
 
                 if (moduleAssessments != null && moduleAssessments.Any())
                 {
@@ -217,14 +228,20 @@ namespace AdministratorSystem.Controllers
                     {
                         var assesId = asses.AssessmentId;
 
-                        var corresponding = module.ModuleAssessments.FirstOrDefault(ma => ma.AssessmentId == assesId);
-
-                        var correspondingAssessment = corresponding.Assessment.StudentAssessments.FirstOrDefault(sm => sm.AssessmentId == assessmentId && sm.ModuleId == moduleAssessment.ModuleId);
+                        var correspondingAssessment = asses.Assessment.StudentAssessments.FirstOrDefault(sm => sm.ModuleId == module.ModuleId);
 
                         if (correspondingAssessment != null)
                         {
                             CalculateModuleMark += correspondingAssessment.Mark ?? 0;
+
+                            moduleAssessmentsDto.Add(new StudentAssessmentDto
+                            {
+                                AssessmentId = correspondingAssessment.AssessmentId,
+                                Title = asses.Assessment.Title,
+                                Mark = correspondingAssessment.Mark
+                            });
                         }
+
                     }
 
                     var studentModule = _context.StudentModule
@@ -243,7 +260,18 @@ namespace AdministratorSystem.Controllers
                     studentModule.Mark = CalculateModuleMark;
                     studentModule.Result = CalculateModuleMark >= 50 ? "Pass" : (CalculateModuleMark >= 45 ? "PassCompensation" : "Fail");
 
-                    await _context.SaveChangesAsync();
+                    var studentModuleDto = new StudentModuleDto
+                    {
+                        ModuleId = module.ModuleId,
+                        Mark = (int)studentModule.Mark,
+                        Result = studentModule.Result,
+                        Title = module.Title,
+                        Assessments = moduleAssessmentsDto
+                    };
+
+                    modulesForCourse.Add(studentModuleDto);
+
+                await _context.SaveChangesAsync();
                 }
                 else
                 {
@@ -294,7 +322,23 @@ namespace AdministratorSystem.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Ok(student);
+           
+            var finalResult = new StudentDto
+            {
+                StudentId = student.StudentId,
+                FullName = student.FullName,
+                Course = new StudentCourseDto
+                {
+                    CourseId = course.CourseId,
+                    Title = student.Cohort.Course.Title,
+                    Mark = course.Mark,
+                    Result = course.Result,
+                    Modules = modulesForCourse
+                }
+            };
+
+
+            return Ok(finalResult);
         }
 
     }

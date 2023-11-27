@@ -19,7 +19,7 @@ namespace AdministratorSystem.Controllers
         [HttpPost("addCourse/{title}/{durationInYears}")]
         public async Task<ActionResult<List<Course>>> AddCourse(string title, int durationInYears)
         {
-            if (durationInYears < 1 && durationInYears > 3)
+            if (durationInYears < 1 || durationInYears > 3)
             {
                 return BadRequest($"The durationInYears should be a number between 1 to 3");
             }

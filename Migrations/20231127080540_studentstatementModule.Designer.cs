@@ -3,6 +3,7 @@ using System;
 using AdministratorSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdministratorSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231127080540_studentstatementModule")]
+    partial class studentstatementModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
@@ -38,7 +41,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Assessment", (string)null);
+                    b.ToTable("Assessment");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Cohort", b =>
@@ -58,7 +61,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Cohort", (string)null);
+                    b.ToTable("Cohort");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Course", b =>
@@ -76,7 +79,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasKey("CourseId");
 
-                    b.ToTable("Course", (string)null);
+                    b.ToTable("Course");
                 });
 
             modelBuilder.Entity("AdministratorSystem.CourseModule", b =>
@@ -94,7 +97,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("CourseModule", (string)null);
+                    b.ToTable("CourseModule");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Module", b =>
@@ -123,7 +126,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Module", (string)null);
+                    b.ToTable("Module");
                 });
 
             modelBuilder.Entity("AdministratorSystem.ModuleAssessment", b =>
@@ -141,7 +144,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("AssessmentId");
 
-                    b.ToTable("ModuleAssessment", (string)null);
+                    b.ToTable("ModuleAssessment");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Student", b =>
@@ -161,7 +164,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("CohortId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("AdministratorSystem.StudentAssessment", b =>
@@ -190,7 +193,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentAssessments", (string)null);
+                    b.ToTable("StudentAssessments");
                 });
 
             modelBuilder.Entity("AdministratorSystem.StudentCourse", b =>
@@ -217,7 +220,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentCourse", (string)null);
+                    b.ToTable("StudentCourse");
                 });
 
             modelBuilder.Entity("AdministratorSystem.StudentModule", b =>
@@ -244,7 +247,7 @@ namespace AdministratorSystem.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentModule", (string)null);
+                    b.ToTable("StudentModule");
                 });
 
             modelBuilder.Entity("AdministratorSystem.Assessment", b =>

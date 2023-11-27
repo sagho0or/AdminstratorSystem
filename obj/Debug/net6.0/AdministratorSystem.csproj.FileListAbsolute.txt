@@ -238,7 +238,6 @@ F:\Projects\AdminstratorSystem\obj\Debug\net6.0\refint\AdministratorSystem.dll
 F:\Projects\AdminstratorSystem\obj\Debug\net6.0\AdministratorSystem.pdb
 F:\Projects\AdminstratorSystem\obj\Debug\net6.0\AdministratorSystem.genruntimeconfig.cache
 F:\Projects\AdminstratorSystem\obj\Debug\net6.0\ref\AdministratorSystem.dll
-C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\bin\Debug\net6.0\appsettings.Development.json
 C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\bin\Debug\net6.0\appsettings.json
 C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\bin\Debug\net6.0\AdministratorSystem.exe
 C:\Users\Sagharfadaei\Documents\Projects\C#-assessment\AdminstratorSystem\bin\Debug\net6.0\AdministratorSystem.deps.json
