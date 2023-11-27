@@ -384,32 +384,43 @@ namespace AdministratorSystem.Controllers
 
             if (course != null)
             {
-                var modulesWithMarksCount = student.StudentModules.Count(sm => sm.Mark != null);
-
-                if (modulesWithMarksCount > 0)
+                //The programme mark is undefined if any module mark is undefined
+                bool hasNullModuleMark = student.StudentModules.Any(sm => sm.Mark == null);
+                if (hasNullModuleMark)
                 {
-                    var courseModulesMarks = student.StudentModules.Sum(sm => sm.Mark ?? 0);
-                    var averageMark = (double)courseModulesMarks / modulesWithMarksCount;
-                    course.Mark = (int)Math.Round(averageMark);
-
-                    if (course.Mark >= 70)
-                    {
-                        course.Result = "Distinction";
-                    }
-                    else if (course.Mark >= 50)
-                    {
-                        course.Result = "Pass";
-                    }
-                    else
-                    {
-                        course.Result = "Fail";
-                    }
+                    course.Mark = null;
+                    course.Result = null;
                 }
                 else
                 {
-                    course.Mark = null;
-                    course.Result = "Undefined";
+                    var modulesWithMarksCount = student.StudentModules.Count(sm => sm.Mark != null);
+
+                    if (modulesWithMarksCount > 0)
+                    {
+                        var courseModulesMarks = student.StudentModules.Sum(sm => sm.Mark ?? 0);
+                        var averageMark = (double)courseModulesMarks / modulesWithMarksCount;
+                        course.Mark = (int)Math.Round(averageMark);
+
+                        if (course.Mark >= 70)
+                        {
+                            course.Result = "Distinction";
+                        }
+                        else if (course.Mark >= 50)
+                        {
+                            course.Result = "Pass";
+                        }
+                        else
+                        {
+                            course.Result = "Fail";
+                        }
+                    }
+                    else
+                    {
+                        course.Mark = null;
+                        course.Result = "Undefined";
+                    }
                 }
+                
 
                 await _context.SaveChangesAsync();
             }
