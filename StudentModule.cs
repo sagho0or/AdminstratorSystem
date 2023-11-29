@@ -11,5 +11,6 @@ namespace AdministratorSystem
         public Module Module { get; set; }
         public int? Mark { get; set; }
         public string? Result { get; set; }
+        public bool IsSelected { get; set; } = true;
     }
 }

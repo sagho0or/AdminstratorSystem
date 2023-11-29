@@ -27,8 +27,9 @@ namespace AdministratorSystem.NewFolder
     {
         public int ModuleId { get; set; }
         public string Title { get; set; }
-        public int Mark { get; set; }
-        public string Result { get; set; }
+        public int? Mark { get; set; }
+        public string? Result { get; set; }
+        public bool IsRequired { get; set; }
         public ICollection<StudentAssessmentDto> Assessments { get; set; }
 
     }

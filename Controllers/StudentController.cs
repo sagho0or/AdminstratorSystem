@@ -133,6 +133,25 @@ namespace AdministratorSystem.Controllers
             return Ok(cohort);
         }
 
+        [HttpGet("optionalModules/remove/{studentId}/{moduleId}")]
+        public async Task<ActionResult<List<Student>>> UnselectModule(int studentId, int moduleId)
+        {
+            var studentModule = await _context.StudentModules.FirstOrDefaultAsync(cm => cm.ModuleId == moduleId && cm.StudentId == studentId);
+
+            if (studentModule != null)
+            {
+                // Remove the module from the StudentModules
+                _context.StudentModules.Remove(studentModule);
+                await _context.SaveChangesAsync();
+
+                return Ok("The Optional Module Remove successfully");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
@@ -203,6 +222,7 @@ namespace AdministratorSystem.Controllers
                         Mark = (int)studentModule.Mark,
                         Result = studentModule.Result,
                         Title = module.Title,
+                        IsRequired = module.IsRequired,
                         Assessments = moduleAssessmentsDto
                     };
 
@@ -348,20 +368,39 @@ namespace AdministratorSystem.Controllers
                         };
                         _context.StudentModule.Add(studentModule);
                     }
-
-                    studentModule.Mark = CalculateModuleMark;
-                    studentModule.Result = CalculateModuleMark >= 50 ? "Pass" : (CalculateModuleMark >= 45 ? "PassCompensation" : "Fail");
-
-                    var studentModuleDto = new StudentModuleDto
+                    //The programme mark is undefined if any module mark is undefined
+                    bool hasNullAssessmentMark = moduleAssessments.Any(sm => sm.Assessment.StudentAssessments.FirstOrDefault(sm => sm.ModuleId == module.ModuleId).Mark == null);
+                    if (hasNullAssessmentMark)
                     {
-                        ModuleId = module.ModuleId,
-                        Mark = (int)studentModule.Mark,
-                        Result = studentModule.Result,
-                        Title = module.Title,
-                        Assessments = moduleAssessmentsDto
-                    };
+                        studentModule.Mark = null;
+                        studentModule.Result = null;
+                        var studentModuleDto = new StudentModuleDto
+                        {
+                            ModuleId = module.ModuleId,
+                            Mark = null,
+                            Result = null,
+                            Title = module.Title,
+                            Assessments = moduleAssessmentsDto
+                        };
 
-                    modulesForCourse.Add(studentModuleDto);
+                        modulesForCourse.Add(studentModuleDto);
+                    }
+                    else
+                    {
+                        studentModule.Mark = CalculateModuleMark;
+                        studentModule.Result = CalculateModuleMark >= 50 ? "Pass" : (CalculateModuleMark >= 45 ? "PassCompensation" : "Fail");
+                        var studentModuleDto = new StudentModuleDto
+                        {
+                            ModuleId = module.ModuleId,
+                            Mark = (int)studentModule.Mark,
+                            Result = studentModule.Result,
+                            Title = module.Title,
+                            Assessments = moduleAssessmentsDto
+                        };
+
+                        modulesForCourse.Add(studentModuleDto);
+                    }
+
 
                 await _context.SaveChangesAsync();
                 }
@@ -397,11 +436,15 @@ namespace AdministratorSystem.Controllers
 
                     if (modulesWithMarksCount > 0)
                     {
-                        var courseModulesMarks = student.StudentModules.Sum(sm => sm.Mark ?? 0);
+                        var courseModulesMarks = student.StudentModules.Sum(sm => sm.Mark ?? null);
                         var averageMark = (double)courseModulesMarks / modulesWithMarksCount;
                         course.Mark = (int)Math.Round(averageMark);
 
-                        if (course.Mark >= 70)
+                        if (course.Mark >= null)
+                        {
+                            course.Result = null;
+                        }
+                        else if (course.Mark >= 70)
                         {
                             course.Result = "Distinction";
                         }
